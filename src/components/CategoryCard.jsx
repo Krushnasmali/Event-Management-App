@@ -1,0 +1,86 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+  Dimensions,
+} from 'react-native';
+import { COLORS } from '../theme/colors';
+import { SPACING, BORDER_RADIUS, FONT_SIZE, FONT_WEIGHT } from '../theme/spacing';
+
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = (width - SPACING.lg * 2 - SPACING.md) / 2;
+
+const CategoryCard = ({ item, onPress }) => {
+  return (
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={onPress}
+      style={styles.container}
+    >
+      <ImageBackground
+        source={item.image}
+        style={styles.imageBackground}
+        imageStyle={styles.image}
+      >
+        <View style={styles.overlay} />
+        <View style={styles.content}>
+          <Text style={styles.title}>{item.name}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    width: CARD_WIDTH,
+    height: 220,
+    marginBottom: SPACING.md,
+    marginRight: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    overflow: 'hidden',
+    backgroundColor: COLORS.surface,
+    elevation: 5,
+    shadowColor: COLORS.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  imageBackground: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'flex-end',
+  },
+  image: {
+    borderRadius: BORDER_RADIUS.lg,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: COLORS.overlay,
+    borderRadius: BORDER_RADIUS.lg,
+  },
+  content: {
+    padding: SPACING.lg,
+    zIndex: 1,
+  },
+  title: {
+    fontSize: FONT_SIZE.xl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: COLORS.background,
+    marginBottom: SPACING.sm,
+  },
+  description: {
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.background,
+    opacity: 0.9,
+  },
+});
+
+export default CategoryCard;

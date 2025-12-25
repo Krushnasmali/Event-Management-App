@@ -7,7 +7,6 @@ import {
   StatusBar,
   TouchableOpacity,
   FlatList,
-  ListEmptyComponent,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS } from '../theme/colors';
@@ -27,13 +26,11 @@ const CategoryScreen = ({ route, navigation }) => {
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
 
-  // Get available states for this category
   const availableStates = useMemo(
     () => getStatesForCategory(categoryName),
     [categoryName]
   );
 
-  // Get available cities based on selected state
   const availableCities = useMemo(
     () =>
       selectedState
@@ -42,7 +39,6 @@ const CategoryScreen = ({ route, navigation }) => {
     [categoryName, selectedState]
   );
 
-  // Get vendors filtered by state and city
   const filteredVendors = useMemo(
     () =>
       selectedState && selectedCity
@@ -53,7 +49,7 @@ const CategoryScreen = ({ route, navigation }) => {
 
   const handleStateChange = (state) => {
     setSelectedState(state);
-    setSelectedCity(null); // Reset city when state changes
+    setSelectedCity(null);
   };
 
   const handleCityChange = (city) => {
@@ -99,7 +95,12 @@ const CategoryScreen = ({ route, navigation }) => {
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Icon name="arrow-left" size={24} color={COLORS.background} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{categoryName}</Text>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerTitle}>{categoryName}</Text>
+          <Text style={styles.headerSubtitle}>
+            Filter by location & discover trusted vendors
+          </Text>
+        </View>
         <View style={styles.placeholder} />
       </View>
 
@@ -115,6 +116,22 @@ const CategoryScreen = ({ route, navigation }) => {
               color={categoryColor}
               showUnderline={true}
             />
+
+            <View style={styles.filterCard}>
+              <View style={styles.filterIconCircle}>
+                <Icon
+                  name="map-search-outline"
+                  size={20}
+                  color={categoryColor}
+                />
+              </View>
+              <View style={styles.filterTextContainer}>
+                <Text style={styles.filterTitle}>Search by location</Text>
+                <Text style={styles.filterSubtitle}>
+                  Choose your state and city to see available vendors
+                </Text>
+              </View>
+            </View>
 
             <View style={styles.dropdownsWrapper}>
               <Dropdown
@@ -150,6 +167,7 @@ const CategoryScreen = ({ route, navigation }) => {
         ListEmptyComponent={renderEmptyList}
         contentContainerStyle={styles.listContent}
         scrollEnabled={true}
+        showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
@@ -163,30 +181,81 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.lg,
+    borderBottomLeftRadius: SPACING.xl,
+    borderBottomRightRadius: SPACING.xl,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
   },
   backButton: {
-    padding: SPACING.md,
+    padding: SPACING.sm,
+    marginRight: SPACING.sm,
+  },
+  headerTextContainer: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: FONT_SIZE.xxl,
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.background,
-    flex: 1,
-    textAlign: 'center',
+  },
+  headerSubtitle: {
+    marginTop: SPACING.xs,
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.background,
+    opacity: 0.9,
   },
   placeholder: {
-    width: 40,
+    width: 32,
   },
   filtersContainer: {
     backgroundColor: COLORS.background,
     paddingBottom: SPACING.lg,
   },
+  filterCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    padding: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderRadius: BORDER_RADIUS.lg,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  filterIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: `${COLORS.overlay}`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.md,
+  },
+  filterTextContainer: {
+    flex: 1,
+  },
+  filterTitle: {
+    fontSize: FONT_SIZE.md,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: COLORS.text,
+  },
+  filterSubtitle: {
+    marginTop: 2,
+    fontSize: FONT_SIZE.xs,
+    color: COLORS.textSecondary,
+  },
   dropdownsWrapper: {
     paddingHorizontal: SPACING.lg,
     gap: SPACING.md,
+    marginTop: SPACING.lg,
   },
   resultsInfo: {
     marginHorizontal: SPACING.lg,

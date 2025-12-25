@@ -17,7 +17,7 @@ const CARD_WIDTH = width - SPACING.lg * 2;
 const VendorCard = ({ vendor, onPress, categoryColor }) => {
   return (
     <TouchableOpacity
-      activeOpacity={0.85}
+      activeOpacity={0.9}
       onPress={onPress}
       style={styles.container}
     >
@@ -28,6 +28,10 @@ const VendorCard = ({ vendor, onPress, categoryColor }) => {
           style={styles.image}
           resizeMode="cover"
         />
+
+        {/* Gradient / overlay */}
+        <View style={styles.overlay} />
+
         {/* Availability Badge */}
         <View
           style={[
@@ -39,10 +43,17 @@ const VendorCard = ({ vendor, onPress, categoryColor }) => {
             },
           ]}
         >
+          <Icon
+            name={vendor.availability ? 'check-circle' : 'close-circle'}
+            size={14}
+            color={COLORS.background}
+            style={styles.badgeIcon}
+          />
           <Text style={styles.badgeText}>
             {vendor.availability ? 'Available' : 'Booked'}
           </Text>
         </View>
+
         {/* Rating Badge */}
         <View style={[styles.ratingBadge, { backgroundColor: categoryColor }]}>
           <Icon name="star" size={14} color={COLORS.background} />
@@ -52,10 +63,21 @@ const VendorCard = ({ vendor, onPress, categoryColor }) => {
 
       {/* Content Container */}
       <View style={styles.contentContainer}>
-        {/* Vendor Name */}
-        <Text style={styles.vendorName} numberOfLines={2}>
-          {vendor.name}
-        </Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.vendorName} numberOfLines={2}>
+            {vendor.name}
+          </Text>
+          <View
+            style={[
+              styles.categoryPill,
+              { backgroundColor: categoryColor + '1A' },
+            ]}
+          >
+            <Text style={[styles.categoryPillText, { color: categoryColor }]}>
+              {vendor.category}
+            </Text>
+          </View>
+        </View>
 
         {/* Location */}
         <View style={styles.locationRow}>
@@ -68,7 +90,7 @@ const VendorCard = ({ vendor, onPress, categoryColor }) => {
         {/* Cost and Description Row */}
         <View style={styles.bottomRow}>
           <View style={styles.costContainer}>
-            <Text style={styles.costLabel}>Per Day</Text>
+            <Text style={styles.costLabel}>Per day</Text>
             <Text style={[styles.costValue, { color: categoryColor }]}>
               ₹{(vendor.costPerDay / 1000).toFixed(1)}k
             </Text>
@@ -89,17 +111,17 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     marginHorizontal: SPACING.lg,
     marginBottom: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-    backgroundColor: COLORS.background,
+    borderRadius: BORDER_RADIUS.xl,
+    backgroundColor: COLORS.surface,
     overflow: 'hidden',
     elevation: 4,
     shadowColor: COLORS.shadow,
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
   },
   imageContainer: {
     position: 'relative',
@@ -111,13 +133,22 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+  },
   availabilityBadge: {
     position: 'absolute',
     bottom: SPACING.md,
     left: SPACING.md,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.lg,
+  },
+  badgeIcon: {
+    marginRight: 4,
   },
   badgeText: {
     color: COLORS.background,
@@ -132,7 +163,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.sm,
+    borderRadius: BORDER_RADIUS.lg,
     gap: SPACING.xs,
   },
   ratingText: {
@@ -143,11 +174,25 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: SPACING.md,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
   vendorName: {
     fontSize: FONT_SIZE.lg,
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.text,
-    marginBottom: SPACING.sm,
+    flex: 1,
+  },
+  categoryPill: {
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: SPACING.lg,
+  },
+  categoryPillText: {
+    fontSize: FONT_SIZE.xs,
+    fontWeight: FONT_WEIGHT.semibold,
   },
   locationRow: {
     flexDirection: 'row',
@@ -166,7 +211,7 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   costContainer: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   costLabel: {
     fontSize: FONT_SIZE.xs,

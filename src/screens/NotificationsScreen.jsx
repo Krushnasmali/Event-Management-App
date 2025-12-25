@@ -22,6 +22,7 @@ const NotificationsScreen = () => {
       time: '2 hours ago',
       color: '#4ECDC4',
       unread: true,
+      tag: 'Booking',
     },
     {
       id: 2,
@@ -31,6 +32,7 @@ const NotificationsScreen = () => {
       time: '5 hours ago',
       color: '#FFE66D',
       unread: false,
+      tag: 'Feedback',
     },
     {
       id: 3,
@@ -40,58 +42,102 @@ const NotificationsScreen = () => {
       time: '1 day ago',
       color: '#95E1D3',
       unread: false,
+      tag: 'Update',
     },
   ];
+
+  const hasNotifications = notifications.length > 0;
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notifications</Text>
+        <Text style={styles.headerSubtitle}>
+          Stay updated with your bookings and vendors
+        </Text>
       </View>
 
-      <ScrollView style={styles.scrollView}>
-        {notifications.length > 0 ? (
-          <View style={styles.notificationsList}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={
+          hasNotifications ? styles.notificationsList : styles.emptyWrapper
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {hasNotifications ? (
+          <>
+            <View style={styles.actionsRow}>
+              <TouchableOpacity activeOpacity={0.8}>
+                <Text style={styles.actionText}>Mark all as read</Text>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.8}>
+                <Text style={styles.actionTextSecondary}>Clear all</Text>
+              </TouchableOpacity>
+            </View>
+
             {notifications.map((notification) => (
-              <TouchableOpacity 
-                key={notification.id} 
+              <TouchableOpacity
+                key={notification.id}
                 style={[
                   styles.notificationCard,
                   notification.unread && styles.unreadCard,
                 ]}
-                activeOpacity={0.7}
+                activeOpacity={0.8}
               >
-                <View 
+                <View
                   style={[
                     styles.iconContainer,
-                    { backgroundColor: notification.color + '20' },
+                    { backgroundColor: notification.color + '22' },
                   ]}
                 >
-                  <Icon 
-                    name={notification.icon} 
-                    size={24} 
-                    color={notification.color} 
+                  <Icon
+                    name={notification.icon}
+                    size={22}
+                    color={notification.color}
                   />
                 </View>
+
                 <View style={styles.content}>
-                  <Text style={styles.title}>{notification.title}</Text>
-                  <Text style={styles.message}>{notification.message}</Text>
-                  <Text style={styles.time}>{notification.time}</Text>
+                  <View style={styles.titleRow}>
+                    <Text style={styles.title}>{notification.title}</Text>
+                    {!!notification.tag && (
+                      <View style={styles.tagChip}>
+                        <Text style={styles.tagText}>{notification.tag}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.message} numberOfLines={2}>
+                    {notification.message}
+                  </Text>
+                  <View style={styles.metaRow}>
+                    <Icon
+                      name="clock-outline"
+                      size={14}
+                      color={COLORS.textLight}
+                      style={styles.timeIcon}
+                    />
+                    <Text style={styles.time}>{notification.time}</Text>
+                  </View>
                 </View>
+
                 {notification.unread && <View style={styles.unreadDot} />}
               </TouchableOpacity>
             ))}
-          </View>
+          </>
         ) : (
           <View style={styles.emptyContainer}>
-            <Icon 
-              name="bell-off" 
-              size={64} 
-              color={COLORS.textLight} 
+            <Icon
+              name="bell-off-outline"
+              size={64}
+              color={COLORS.textLight}
               style={styles.emptyIcon}
             />
-            <Text style={styles.emptyText}>No notifications</Text>
+            <Text style={styles.emptyTitle}>You’re all caught up</Text>
+            <Text style={styles.emptyText}>
+              New notifications about your bookings and vendors will appear here.
+            </Text>
           </View>
         )}
       </ScrollView>
@@ -106,84 +152,144 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
-    backgroundColor: COLORS.accent,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.lg,
+    backgroundColor: COLORS.surface,
+    borderBottomLeftRadius: SPACING.xl,
+    borderBottomRightRadius: SPACING.xl,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
   },
   headerTitle: {
     fontSize: FONT_SIZE.xxl,
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.text,
   },
+  headerSubtitle: {
+    marginTop: SPACING.xs,
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.textSecondary,
+  },
   scrollView: {
     flex: 1,
   },
   notificationsList: {
     padding: SPACING.lg,
+    paddingBottom: SPACING.xxxl,
+  },
+  emptyWrapper: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: SPACING.lg,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.md,
+  },
+  actionText: {
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.primary,
+    fontWeight: FONT_WEIGHT.semibold,
+  },
+  actionTextSecondary: {
+    fontSize: FONT_SIZE.sm,
+    color: COLORS.textSecondary,
   },
   notificationCard: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.lg,
+    padding: SPACING.md,
     marginBottom: SPACING.md,
-    elevation: 2,
     shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
   },
   unreadCard: {
-    backgroundColor: '#F0F8FF',
-    borderLeftWidth: 4,
+    borderLeftWidth: 3,
     borderLeftColor: COLORS.primary,
   },
   iconContainer: {
-    width: 50,
-    height: 50,
+    width: 46,
+    height: 46,
     borderRadius: BORDER_RADIUS.md,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: SPACING.lg,
+    marginRight: SPACING.md,
   },
   content: {
     flex: 1,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
   },
   title: {
     fontSize: FONT_SIZE.md,
     fontWeight: FONT_WEIGHT.semibold,
     color: COLORS.text,
-    marginBottom: SPACING.xs,
+    flex: 1,
+  },
+  tagChip: {
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: SPACING.lg,
+    backgroundColor: COLORS.background,
+  },
+  tagText: {
+    fontSize: FONT_SIZE.xs,
+    color: COLORS.textSecondary,
   },
   message: {
     fontSize: FONT_SIZE.sm,
     color: COLORS.textSecondary,
     marginBottom: SPACING.xs,
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  timeIcon: {
+    marginRight: 4,
+  },
   time: {
     fontSize: FONT_SIZE.xs,
     color: COLORS.textLight,
   },
   unreadDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: COLORS.primary,
-    marginLeft: SPACING.md,
+    marginLeft: SPACING.sm,
+    marginTop: SPACING.xs,
   },
   emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: SPACING.xxxl,
   },
   emptyIcon: {
-    marginBottom: SPACING.xl,
-    opacity: 0.5,
+    marginBottom: SPACING.lg,
+    opacity: 0.6,
+  },
+  emptyTitle: {
+    fontSize: FONT_SIZE.lg,
+    fontWeight: FONT_WEIGHT.bold,
+    color: COLORS.text,
+    marginBottom: SPACING.xs,
   },
   emptyText: {
-    fontSize: FONT_SIZE.lg,
+    fontSize: FONT_SIZE.sm,
     color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
 

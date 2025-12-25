@@ -16,7 +16,7 @@ const CARD_WIDTH = (width - SPACING.lg * 2 - SPACING.md) / 2;
 const CategoryCard = ({ item, onPress }) => {
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
+      activeOpacity={0.9}
       onPress={onPress}
       style={styles.container}
     >
@@ -28,7 +28,9 @@ const CategoryCard = ({ item, onPress }) => {
         <View style={styles.overlay} />
         <View style={styles.content}>
           <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.description} numberOfLines={2}>
+            {item.description}
+          </Text>
         </View>
       </ImageBackground>
     </TouchableOpacity>
@@ -38,20 +40,20 @@ const CategoryCard = ({ item, onPress }) => {
 const styles = StyleSheet.create({
   container: {
     width: CARD_WIDTH,
-    height: 220,
+    height: 210,
     marginBottom: SPACING.md,
     marginRight: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     overflow: 'hidden',
     backgroundColor: COLORS.surface,
-    elevation: 5,
+    elevation: 4,
     shadowColor: COLORS.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.18,
+    shadowRadius: 3.5,
   },
   imageBackground: {
     width: '100%',
@@ -67,17 +69,17 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
   },
   content: {
-    padding: SPACING.lg,
+    padding: SPACING.md,
     zIndex: 1,
   },
   title: {
-    fontSize: FONT_SIZE.xl,
+    fontSize: FONT_SIZE.lg,
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.background,
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.xs,
   },
   description: {
-    fontSize: FONT_SIZE.sm,
+    fontSize: FONT_SIZE.xs,
     color: COLORS.background,
     opacity: 0.9,
   },

@@ -28,21 +28,37 @@ const BottomTabsNavigator = () => {
             iconName = focused ? 'account' : 'account-outline';
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return (
+            <Icon
+              name={iconName}
+              size={size}
+              color={color}
+            />
+          );
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textLight,
+        tabBarShowLabel: true,
         tabBarStyle: {
-          backgroundColor: COLORS.background,
-          borderTopColor: COLORS.border,
-          borderTopWidth: 1,
-          paddingTop: 5,
-          height: 60,
+          position: 'absolute',
+          left: 16,
+          right: 16,
+          bottom: 12,
+          borderRadius: 24,
+          backgroundColor: COLORS.surface,
+          borderTopWidth: 0,
+          elevation: 8,
+          shadowColor: COLORS.shadow,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.18,
+          shadowRadius: 6,
+          height: 64,
+          paddingBottom: 6,
+          paddingTop: 6,
         },
         tabBarLabelStyle: {
           fontSize: FONT_SIZE.xs,
           fontWeight: '600',
-          marginBottom: 5,
         },
       })}
     >
@@ -64,7 +80,7 @@ const BottomTabsNavigator = () => {
         name="NotificationsTab"
         component={NotificationsScreen}
         options={{
-          title: 'Notifications',
+          title: 'Alerts',
         }}
       />
       <Tab.Screen

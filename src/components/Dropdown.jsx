@@ -34,17 +34,22 @@ const Dropdown = ({
         selectedValue === item && styles.selectedOption,
       ]}
       onPress={() => handleSelect(item)}
+      activeOpacity={0.8}
     >
-      <Text
-        style={[
-          styles.optionText,
-          selectedValue === item && styles.selectedOptionText,
-        ]}
-      >
-        {item}
-      </Text>
+      <View style={styles.optionLeft}>
+        <View style={styles.optionBullet} />
+        <Text
+          style={[
+            styles.optionText,
+            selectedValue === item && styles.selectedOptionText,
+          ]}
+          numberOfLines={1}
+        >
+          {item}
+        </Text>
+      </View>
       {selectedValue === item && (
-        <Icon name="check" size={20} color={color} />
+        <Icon name="check-circle" size={20} color={color} />
       )}
     </TouchableOpacity>
   );
@@ -53,24 +58,50 @@ const Dropdown = ({
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       <TouchableOpacity
-        style={[styles.dropdown, { borderColor: color }]}
+        style={[
+          styles.dropdown,
+          { borderColor: selectedValue ? color + '55' : COLORS.border },
+        ]}
         onPress={() => setModalVisible(true)}
-        activeOpacity={0.8}
+        activeOpacity={0.85}
       >
-        <Text
-          style={[
-            styles.dropdownText,
-            !selectedValue && styles.placeholderText,
-          ]}
-        >
-          {selectedValue || placeholder}
-        </Text>
-        <Icon
-          name="chevron-down"
-          size={24}
-          color={color}
-          style={styles.icon}
-        />
+        <View style={styles.leftContent}>
+          <Icon
+            name="map-marker-radius"
+            size={18}
+            color={selectedValue ? color : COLORS.textLight}
+            style={styles.leftIcon}
+          />
+          <Text
+            style={[
+              styles.dropdownText,
+              !selectedValue && styles.placeholderText,
+            ]}
+            numberOfLines={1}
+          >
+            {selectedValue || placeholder}
+          </Text>
+        </View>
+        <View style={styles.rightIcons}>
+          {selectedValue && (
+            <TouchableOpacity
+              onPress={() => onSelect(null)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Icon
+                name="close-circle-outline"
+                size={18}
+                color={COLORS.textLight}
+                style={styles.clearIcon}
+              />
+            </TouchableOpacity>
+          )}
+          <Icon
+            name={modalVisible ? 'chevron-up' : 'chevron-down'}
+            size={22}
+            color={color}
+          />
+        </View>
       </TouchableOpacity>
 
       <Modal
@@ -79,23 +110,34 @@ const Dropdown = ({
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{label || 'Select'}</Text>
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}
-            >
-              <Icon name="close" size={24} color={COLORS.text} />
-            </TouchableOpacity>
+        <SafeAreaView style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalGrabber} />
+
+            <View style={styles.modalHeader}>
+              <View>
+                <Text style={styles.modalTitle}>{label || 'Select option'}</Text>
+                <Text style={styles.modalSubtitle}>
+                  Choose one option from the list below
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <Icon name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+
+            <FlatList
+              data={options}
+              renderItem={renderOption}
+              keyExtractor={(item) => item}
+              style={styles.optionsList}
+              scrollEnabled={true}
+              showsVerticalScrollIndicator={false}
+            />
           </View>
-          <FlatList
-            data={options}
-            renderItem={renderOption}
-            keyExtractor={(item) => item}
-            style={styles.optionsList}
-            scrollEnabled={true}
-          />
         </SafeAreaView>
       </Modal>
     </View>
@@ -107,10 +149,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   label: {
-    fontSize: FONT_SIZE.md,
+    fontSize: FONT_SIZE.sm,
     fontWeight: FONT_WEIGHT.semibold,
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
   },
   dropdown: {
     flexDirection: 'row',
@@ -118,9 +160,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
-    borderWidth: 1.5,
-    borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.background,
+    borderWidth: 1.2,
+    borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: COLORS.surface,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  leftContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  leftIcon: {
+    marginRight: SPACING.sm,
   },
   dropdownText: {
     fontSize: FONT_SIZE.md,
@@ -131,19 +186,45 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: COLORS.textLight,
   },
-  icon: {
-    marginLeft: SPACING.sm,
+  rightIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  modalContainer: {
+  clearIcon: {
+    marginRight: 4,
+  },
+  modalOverlay: {
     flex: 1,
+    backgroundColor: '#00000055',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    maxHeight: '60%',
     backgroundColor: COLORS.background,
+    borderTopLeftRadius: SPACING.xxl,
+    borderTopRightRadius: SPACING.xxl,
+    paddingBottom: SPACING.lg,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  modalGrabber: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.border,
+    alignSelf: 'center',
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.sm,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingBottom: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -152,32 +233,48 @@ const styles = StyleSheet.create({
     fontWeight: FONT_WEIGHT.bold,
     color: COLORS.text,
   },
+  modalSubtitle: {
+    marginTop: 2,
+    fontSize: FONT_SIZE.xs,
+    color: COLORS.textSecondary,
+  },
   closeButton: {
     padding: SPACING.sm,
   },
   optionsList: {
-    flex: 1,
-    paddingHorizontal: SPACING.md,
+    paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
   },
   optionItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.lg,
+    paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
+  },
+  optionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  optionBullet: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.border,
+    marginRight: SPACING.sm,
   },
   selectedOption: {
     backgroundColor: COLORS.surface,
     borderRadius: BORDER_RADIUS.md,
-    paddingHorizontal: SPACING.md,
+    paddingHorizontal: SPACING.sm,
   },
   optionText: {
     fontSize: FONT_SIZE.md,
     color: COLORS.text,
     fontWeight: FONT_WEIGHT.medium,
+    flex: 1,
   },
   selectedOptionText: {
     fontWeight: FONT_WEIGHT.bold,

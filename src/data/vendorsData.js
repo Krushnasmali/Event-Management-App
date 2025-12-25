@@ -1,3 +1,5 @@
+//vendorsData.js
+
 export const VENDORS_DATA = [
   // Mandap/Tent Vendors
   {

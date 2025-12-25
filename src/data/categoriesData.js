@@ -1,3 +1,5 @@
+//categoriesData.js
+
 export const CATEGORIES_DATA = [
   {
     id: '1',

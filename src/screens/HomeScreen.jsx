@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import {
   View,
   FlatList,
@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import { SPACING, FONT_SIZE, FONT_WEIGHT } from '../theme/spacing';
 import { CATEGORIES_DATA } from '../data/categoriesData';
+import firebaseAuth from '../services/firebaseAuth';
 
 const FEATURED_EVENT = {
   title: 'International Concert',
@@ -40,9 +41,44 @@ const NEARBY_EVENTS = [
   },
 ];
 
+/**
+ * Get time-based greeting
+ * 5:00 AM - 11:59 AM: Good Morning
+ * 12:00 PM - 4:59 PM: Good Afternoon
+ * 5:00 PM - 8:59 PM: Good Evening
+ * 9:00 PM - 4:59 AM: Good Night
+ */
+const getTimeBasedGreeting = () => {
+  const currentHour = new Date().getHours();
+
+  if (currentHour >= 5 && currentHour < 12) {
+    return 'Good Morning';
+  } else if (currentHour >= 12 && currentHour < 17) {
+    return 'Good Afternoon';
+  } else if (currentHour >= 17 && currentHour < 21) {
+    return 'Good Evening';
+  } else {
+    return 'Good Night';
+  }
+};
+
 const HomeScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [activeTrending, setActiveTrending] = useState('all');
+  const [greeting, setGreeting] = useState('Good Evening');
+  const [userName, setUserName] = useState('there');
+
+  useEffect(() => {
+    // Set time-based greeting
+    setGreeting(getTimeBasedGreeting());
+
+    // Get user name from Firebase
+    const currentUser = firebaseAuth.getCurrentUser();
+    if (currentUser && currentUser.displayName) {
+      const firstName = currentUser.displayName.split(' ')[0];
+      setUserName(firstName);
+    }
+  }, []);
 
   const filteredCategories = useMemo(() => {
     return CATEGORIES_DATA.filter(category =>
@@ -126,7 +162,9 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <Text style={styles.headerGreeting}>Hi, Good Evening 👋</Text>
+      <Text style={styles.headerGreeting}>
+        {greeting}, {userName} 👋
+      </Text>
       <Text style={styles.headerBigTitle}>Discover Events</Text>
 
       {/* SEARCH */}

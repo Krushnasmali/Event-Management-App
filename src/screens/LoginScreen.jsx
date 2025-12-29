@@ -18,12 +18,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT, BORDER_RADIUS } from '../theme/spacing';
 import CustomModal from '../components/CustomModal';
-
-const DEMO_CREDENTIALS = [
-  { email: 'user@example.com', password: 'password123' },
-  { email: 'test@test.com', password: 'test123' },
-  { email: 'demo@demo.com', password: 'demo123' },
-];
+import firebaseAuth from '../services/firebaseAuth';
 
 const LoginScreen = ({ navigation }) => {
   const { colors } = useTheme();
@@ -36,51 +31,38 @@ const LoginScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
-  const [modalButtons, setModalButtons] = useState([]);
 
-  const showModal = (
-    title,
-    message,
-    buttons = [{ text: 'OK', onPress: () => setModalVisible(false) }]
-  ) => {
+  const showModal = (title, message) => {
     setModalTitle(title);
     setModalMessage(message);
-    setModalButtons(buttons);
     setModalVisible(true);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       showModal('Validation', 'Please enter email and password');
       return;
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      const isValid = DEMO_CREDENTIALS.some(
-        cred => cred.email === email && cred.password === password
-      );
+    const result = await firebaseAuth.signIn(email.trim(), password);
+    setIsLoading(false);
 
-      if (isValid) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainApp' }],
-        });
-      } else {
-        showModal(
-          'Login Failed',
-          'Invalid email or password.\n\nDemo credentials:\nuser@example.com / password123\ntest@test.com / test123\ndemo@demo.com / demo123'
-        );
-      }
-      setIsLoading(false);
-    }, 600);
+    if (result.success) {
+      // Authentication successful - navigation handled by App.jsx via onAuthStateChanged
+      showModal('Success', 'Logged in successfully!');
+      // Clear form
+      setEmail('');
+      setPassword('');
+    } else {
+      showModal('Login Failed', result.error);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#090017" />
 
-      {/* Background Gradient */}
       <LinearGradient
         colors={['#0B061A', '#1A0B3D', '#2A0E6F']}
         style={StyleSheet.absoluteFill}
@@ -90,28 +72,16 @@ const LoginScreen = ({ navigation }) => {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* Glass Card */}
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.card}>
-            {/* Logo */}
             <View style={styles.logoWrap}>
-              <LinearGradient
-                colors={['#8B5CF6', '#6D28D9']}
-                style={styles.logoCircle}
-              >
+              <LinearGradient colors={['#8B5CF6', '#6D28D9']} style={styles.logoCircle}>
                 <Icon name="calendar-heart" size={36} color="#fff" />
               </LinearGradient>
               <Text style={styles.appName}>Evento</Text>
-              <Text style={styles.subtitle}>
-                Welcome back, sign in to continue
-              </Text>
+              <Text style={styles.subtitle}>Welcome back, sign in to continue</Text>
             </View>
 
-            {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email</Text>
               <View style={styles.inputBox}>
@@ -124,19 +94,13 @@ const LoginScreen = ({ navigation }) => {
                   onChangeText={setEmail}
                   autoCapitalize="none"
                   keyboardType="email-address"
+                  editable={!isLoading}
                 />
               </View>
             </View>
 
-            {/* Password */}
             <View style={styles.inputGroup}>
-              <View style={styles.labelRow}>
-                <Text style={styles.label}>Password</Text>
-                <TouchableOpacity>
-                  <Text style={styles.forgot}>Forgot?</Text>
-                </TouchableOpacity>
-              </View>
-
+              <Text style={styles.label}>Password</Text>
               <View style={styles.inputBox}>
                 <Icon name="lock-outline" size={20} color="#AAA" />
                 <TextInput
@@ -146,34 +110,16 @@ const LoginScreen = ({ navigation }) => {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
+                  editable={!isLoading}
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <Icon
-                    name={showPassword ? 'eye' : 'eye-off'}
-                    size={20}
-                    color="#AAA"
-                  />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} disabled={isLoading}>
+                  <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#AAA" />
                 </TouchableOpacity>
               </View>
             </View>
 
-            {/* Demo info */}
-            <View style={styles.demoBox}>
-              <Icon name="information-outline" size={18} color="#8B5CF6" />
-              <View style={{ marginLeft: 8 }}>
-                <Text style={styles.demoTitle}>Demo login</Text>
-                <Text style={styles.demoText}>
-                  user@example.com / password123
-                </Text>
-              </View>
-            </View>
-
-            {/* Login Button */}
             <TouchableOpacity
-              style={[
-                styles.loginBtn,
-                { opacity: isLoading ? 0.7 : 1 },
-              ]}
+              style={[styles.loginBtn, { opacity: isLoading ? 0.7 : 1 }]}
               onPress={handleLogin}
               disabled={isLoading}
             >
@@ -183,29 +129,9 @@ const LoginScreen = ({ navigation }) => {
               <Icon name="arrow-right" size={20} color="#090017" />
             </TouchableOpacity>
 
-            {/* Divider */}
-            <View style={styles.dividerRow}>
-              <View style={styles.divider} />
-              <Text style={styles.dividerText}>or</Text>
-              <View style={styles.divider} />
-            </View>
-
-            {/* Social */}
-            <View style={styles.socialRow}>
-              <TouchableOpacity style={styles.socialBtn}>
-                <Icon name="google" size={20} color="#fff" />
-                <Text style={styles.socialText}>Google</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialBtn}>
-                <Icon name="apple" size={20} color="#fff" />
-                <Text style={styles.socialText}>Apple</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Register */}
             <View style={styles.footer}>
               <Text style={styles.footerText}>New to Evento?</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
+              <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')} disabled={isLoading}>
                 <Text style={styles.register}>Create account</Text>
               </TouchableOpacity>
             </View>
@@ -217,201 +143,106 @@ const LoginScreen = ({ navigation }) => {
         visible={modalVisible}
         title={modalTitle}
         message={modalMessage}
-        buttons={modalButtons}
-        onClose={() => setModalVisible(false)}
+        buttons={[{ text: 'OK', onPress: () => setModalVisible(false) }]}
       />
     </SafeAreaView>
   );
 };
 
-export default LoginScreen;
-
-/* ---------------- STYLES ---------------- */
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050012',
   },
-
   scroll: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.xxl,
   },
-
   card: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: BORDER_RADIUS.xl || 24,
-    padding: SPACING.xxl,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(30, 25, 60, 0.6)',
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.xl,
+    marginBottom: SPACING.xl,
   },
-
   logoWrap: {
     alignItems: 'center',
-    marginBottom: SPACING.xxl,
+    marginBottom: SPACING.xl,
   },
-
   logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    alignItems: 'center',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: SPACING.md,
   },
-
   appName: {
-    fontSize: FONT_SIZE.xxxl,
+    fontSize: FONT_SIZE.xl,
     fontWeight: FONT_WEIGHT.bold,
-    color: '#fff',
+    color: '#FFFFFF',
+    marginBottom: SPACING.sm,
   },
-
   subtitle: {
-    marginTop: 4,
     fontSize: FONT_SIZE.sm,
     color: '#AAA',
     textAlign: 'center',
   },
-
   inputGroup: {
     marginBottom: SPACING.lg,
   },
-
   label: {
     fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.semibold,
-    color: '#DDD',
-    marginBottom: 6,
+    fontWeight: FONT_WEIGHT.semiBold,
+    color: '#CCC',
+    marginBottom: SPACING.xs,
   },
-
-  labelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-
-  forgot: {
-    color: '#8B5CF6',
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.semibold,
-  },
-
   inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1A0F3A',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: BORDER_RADIUS.lg,
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    gap: SPACING.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
-
   input: {
     flex: 1,
-    fontSize: FONT_SIZE.md,
-    color: '#fff',
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    fontSize: FONT_SIZE.base,
+    color: '#FFF',
   },
-
-  demoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(139,92,246,0.15)',
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    marginTop: SPACING.sm,
-    marginBottom: SPACING.xl,
-  },
-
-  demoTitle: {
-    color: '#fff',
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.semibold,
-  },
-
-  demoText: {
-    color: '#DDD',
-    fontSize: FONT_SIZE.sm,
-  },
-
   loginBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#B783FF',
-    paddingVertical: SPACING.lg,
-    borderRadius: BORDER_RADIUS.lg,
-    marginBottom: SPACING.lg,
-    gap: SPACING.sm,
-  },
-
-  loginText: {
-    color: '#090017',
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.bold,
-  },
-
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.lg,
-  },
-
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-
-  dividerText: {
-    marginHorizontal: SPACING.md,
-    color: '#AAA',
-    fontSize: FONT_SIZE.sm,
-  },
-
-  socialRow: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-    marginBottom: SPACING.lg,
-  },
-
-  socialBtn: {
-    flex: 1,
+    backgroundColor: '#8B5CF6',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
-    gap: SPACING.sm,
+    marginBottom: SPACING.lg,
   },
-
-  socialText: {
-    color: '#fff',
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.semibold,
+  loginText: {
+    fontSize: FONT_SIZE.base,
+    fontWeight: FONT_WEIGHT.semiBold,
+    color: '#090017',
+    marginRight: SPACING.sm,
   },
-
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: SPACING.sm,
+    marginTop: SPACING.lg,
   },
-
   footerText: {
+    fontSize: FONT_SIZE.sm,
     color: '#AAA',
-    fontSize: FONT_SIZE.sm,
+    marginRight: SPACING.xs,
   },
-
   register: {
-    marginLeft: 6,
-    color: '#8B5CF6',
     fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.bold,
+    fontWeight: FONT_WEIGHT.semiBold,
+    color: '#8B5CF6',
   },
 });
+
+export default LoginScreen;

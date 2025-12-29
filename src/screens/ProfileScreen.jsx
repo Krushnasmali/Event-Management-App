@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,42 @@ import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT, BORDER_RADIUS } from '../theme/spacing';
+import CustomModal from '../components/CustomModal';
+import firebaseAuth from '../services/firebaseAuth';
 
 const ProfileScreen = ({ navigation }) => {
   const { colors } = useTheme();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [userName, setUserName] = useState('Guest User');
+  const [userEmail, setUserEmail] = useState('user@eventobooking.com');
+
+  useEffect(() => {
+    // Get current user info from Firebase
+    const currentUser = firebaseAuth.getCurrentUser();
+    if (currentUser) {
+      setUserName(currentUser.displayName || 'User');
+      setUserEmail(currentUser.email || 'user@eventobooking.com');
+    }
+  }, []);
+
+  const handleLogoutPress = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
+    const result = await firebaseAuth.signOut();
+    setIsLoggingOut(false);
+    setShowLogoutModal(false);
+
+    if (!result.success) {
+      // Show error if logout fails
+      alert('Logout Failed', result.error);
+    }
+    // If logout is successful, App.jsx will detect the auth state change
+    // and navigate to LoginScreen automatically
+  };
 
   const menuItems = [
     { icon: 'account-edit', label: 'Edit Profile', color: '#8B5CF6', onPress: () => {} },
@@ -22,7 +55,7 @@ const ProfileScreen = ({ navigation }) => {
     { icon: 'credit-card', label: 'Payment Methods', color: '#34D399', onPress: () => {} },
     { icon: 'cog', label: 'Settings', color: '#A78BFA', onPress: () => navigation.navigate('SettingsScreen') },
     { icon: 'help-circle', label: 'Help & Support', color: '#60A5FA', onPress: () => {} },
-    { icon: 'logout', label: 'Logout', color: '#F87171', onPress: () => {} },
+    { icon: 'logout', label: 'Logout', color: '#F87171', onPress: handleLogoutPress },
   ];
 
   const styles = createStyles(colors);
@@ -47,8 +80,8 @@ const ProfileScreen = ({ navigation }) => {
             <Icon name="account" size={56} color="#fff" />
           </LinearGradient>
 
-          <Text style={styles.name}>Guest User</Text>
-          <Text style={styles.email}>user@eventobooking.com</Text>
+          <Text style={styles.name}>{userName}</Text>
+          <Text style={styles.email}>{userEmail}</Text>
 
           {/* Stats */}
           <View style={styles.statsRow}>
@@ -78,6 +111,7 @@ const ProfileScreen = ({ navigation }) => {
               style={styles.menuItem}
               activeOpacity={0.75}
               onPress={item.onPress}
+              disabled={isLoggingOut}
             >
               <View
                 style={[
@@ -100,6 +134,25 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={styles.brand}>EventoBooking</Text>
         </View>
       </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <CustomModal
+        visible={showLogoutModal}
+        title="Logout?"
+        message="Are you sure you want to logout? You'll need to sign in again to continue."
+        buttons={[
+          {
+            text: 'Cancel',
+            onPress: () => setShowLogoutModal(false),
+            style: 'secondary',
+          },
+          {
+            text: isLoggingOut ? 'Logging out...' : 'Logout',
+            onPress: handleConfirmLogout,
+            disabled: isLoggingOut,
+          },
+        ]}
+      />
     </SafeAreaView>
   );
 };

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "9058807400",
+    "firebase_url": "https://evento-bb2eb-default-rtdb.firebaseio.com",
+    "project_id": "evento-bb2eb",
+    "storage_bucket": "evento-bb2eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9058807400:android:028f8e71931332991ad5dd",
+        "android_client_info": {
+          "package_name": "com.eventmanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "9058807400-l4dkmvd3r16p2mjbmm39a4iimcg16utk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaKbQVOzv9c6cWxJCgErQIKWu2FKScLUk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "9058807400-l4dkmvd3r16p2mjbmm39a4iimcg16utk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

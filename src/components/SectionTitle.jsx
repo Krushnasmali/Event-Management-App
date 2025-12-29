@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: SPACING.lg,
     marginVertical: SPACING.md,
+    marginTop: 30,
   },
   row: {
     flexDirection: 'row',

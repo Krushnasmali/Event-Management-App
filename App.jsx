@@ -1,15 +1,18 @@
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
-import BottomTabsNavigator from './src/navigation/BottomTabs';
+import { ThemeProvider } from './src/theme/ThemeContext';
+import AuthNavigator from './src/navigation/AuthNavigator';
 
 const App = () => {
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <BottomTabsNavigator />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <AuthNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 };
 

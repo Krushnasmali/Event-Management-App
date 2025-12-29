@@ -9,7 +9,7 @@ import {
   FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT, BORDER_RADIUS } from '../theme/spacing';
 import Dropdown from '../components/Dropdown';
 import SectionTitle from '../components/SectionTitle';
@@ -21,6 +21,7 @@ import {
 } from '../data/vendorsData';
 
 const CategoryScreen = ({ route, navigation }) => {
+  const { colors } = useTheme();
   const { categoryName, categoryColor } = route.params;
 
   const [selectedState, setSelectedState] = useState(null);
@@ -69,7 +70,7 @@ const CategoryScreen = ({ route, navigation }) => {
 
   const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
-      <Icon name="store-off-outline" size={60} color={COLORS.textLight} />
+      <Icon name="store-off-outline" size={60} color={colors.textLight} />
       <Text style={styles.emptyText}>
         {!selectedState || !selectedCity
           ? 'Select state and city to see vendors'
@@ -86,18 +87,20 @@ const CategoryScreen = ({ route, navigation }) => {
     />
   );
 
+  const styles = createStyles(colors);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={categoryColor} />
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: categoryColor }]}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <Icon name="arrow-left" size={24} color={COLORS.background} />
+          <Icon name="arrow-left" size={24} color={colors.background} />
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>{categoryName}</Text>
-          <Text style={styles.headerSubtitle}>
+          <Text style={[styles.headerTitle, { color: colors.background }]}>{categoryName}</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.background }]}>
             Filter by location & discover trusted vendors
           </Text>
         </View>
@@ -155,8 +158,8 @@ const CategoryScreen = ({ route, navigation }) => {
             </View>
 
             {filteredVendors.length > 0 && (
-              <View style={styles.resultsInfo}>
-                <Text style={styles.resultsText}>
+              <View style={[styles.resultsInfo, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.resultsText, { color: colors.textSecondary }]}>
                   Found {filteredVendors.length} vendor
                   {filteredVendors.length !== 1 ? 's' : ''}
                 </Text>
@@ -173,120 +176,116 @@ const CategoryScreen = ({ route, navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
-    borderBottomLeftRadius: SPACING.xl,
-    borderBottomRightRadius: SPACING.xl,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 4,
-  },
-  backButton: {
-    padding: SPACING.sm,
-    marginRight: SPACING.sm,
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: FONT_SIZE.xxl,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.background,
-  },
-  headerSubtitle: {
-    marginTop: SPACING.xs,
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.background,
-    opacity: 0.9,
-  },
-  placeholder: {
-    width: 32,
-  },
-  filtersContainer: {
-    backgroundColor: COLORS.background,
-    paddingBottom: SPACING.lg,
-  },
-  filterCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.lg,
-    padding: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.lg,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  filterIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: `${COLORS.overlay}`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: SPACING.md,
-  },
-  filterTextContainer: {
-    flex: 1,
-  },
-  filterTitle: {
-    fontSize: FONT_SIZE.md,
-    fontWeight: FONT_WEIGHT.semibold,
-    color: COLORS.text,
-  },
-  filterSubtitle: {
-    marginTop: 2,
-    fontSize: FONT_SIZE.xs,
-    color: COLORS.textSecondary,
-  },
-  dropdownsWrapper: {
-    paddingHorizontal: SPACING.lg,
-    gap: SPACING.md,
-    marginTop: SPACING.lg,
-  },
-  resultsInfo: {
-    marginHorizontal: SPACING.lg,
-    marginTop: SPACING.lg,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.md,
-  },
-  resultsText: {
-    fontSize: FONT_SIZE.md,
-    color: COLORS.textSecondary,
-    fontWeight: FONT_WEIGHT.semibold,
-  },
-  listContent: {
-    flexGrow: 1,
-    paddingVertical: SPACING.md,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    minHeight: 300,
-  },
-  emptyText: {
-    fontSize: FONT_SIZE.md,
-    color: COLORS.textLight,
-    marginTop: SPACING.lg,
-    textAlign: 'center',
-  },
-});
+const createStyles = (colors, isDarkMode) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.lg,
+      borderBottomLeftRadius: SPACING.xl,
+      borderBottomRightRadius: SPACING.xl,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.2,
+      shadowRadius: 5,
+      elevation: 4,
+    },
+    backButton: {
+      padding: SPACING.sm,
+      marginRight: SPACING.sm,
+    },
+    headerTextContainer: {
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: FONT_SIZE.xxl,
+      fontWeight: FONT_WEIGHT.bold,
+    },
+    headerSubtitle: {
+      marginTop: SPACING.xs,
+      fontSize: FONT_SIZE.sm,
+      opacity: 0.9,
+    },
+    placeholder: {
+      width: 32,
+    },
+    filtersContainer: {
+      backgroundColor: colors.background,
+      paddingBottom: SPACING.lg,
+    },
+    filterCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: SPACING.lg,
+      marginTop: SPACING.lg,
+      padding: SPACING.md,
+      backgroundColor: colors.surface,
+      borderRadius: BORDER_RADIUS.lg,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    filterIconCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.overlay,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: SPACING.md,
+    },
+    filterTextContainer: {
+      flex: 1,
+    },
+    filterTitle: {
+      fontSize: FONT_SIZE.md,
+      fontWeight: FONT_WEIGHT.semibold,
+      color: colors.text,
+    },
+    filterSubtitle: {
+      marginTop: 2,
+      fontSize: FONT_SIZE.xs,
+      color: colors.textSecondary,
+    },
+    dropdownsWrapper: {
+      paddingHorizontal: SPACING.lg,
+      gap: SPACING.md,
+      marginTop: SPACING.lg,
+    },
+    resultsInfo: {
+      marginHorizontal: SPACING.lg,
+      marginTop: SPACING.lg,
+      paddingVertical: SPACING.md,
+      paddingHorizontal: SPACING.md,
+      borderRadius: BORDER_RADIUS.md,
+    },
+    resultsText: {
+      fontSize: FONT_SIZE.md,
+      fontWeight: FONT_WEIGHT.semibold,
+    },
+    listContent: {
+      flexGrow: 1,
+      paddingVertical: SPACING.md,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.lg,
+      minHeight: 300,
+    },
+    emptyText: {
+      fontSize: FONT_SIZE.md,
+      color: colors.textLight,
+      marginTop: SPACING.lg,
+      textAlign: 'center',
+    },
+  });
 
 export default CategoryScreen;

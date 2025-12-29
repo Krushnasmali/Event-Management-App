@@ -9,10 +9,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT, BORDER_RADIUS } from '../theme/spacing';
 
 const NotificationsScreen = () => {
+  const { colors } = useTheme();
   const notifications = [
     {
       id: 1,
@@ -47,10 +48,11 @@ const NotificationsScreen = () => {
   ];
 
   const hasNotifications = notifications.length > 0;
+  const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notifications</Text>
@@ -115,7 +117,7 @@ const NotificationsScreen = () => {
                     <Icon
                       name="clock-outline"
                       size={14}
-                      color={COLORS.textLight}
+                      color={colors.textLight}
                       style={styles.timeIcon}
                     />
                     <Text style={styles.time}>{notification.time}</Text>
@@ -131,10 +133,10 @@ const NotificationsScreen = () => {
             <Icon
               name="bell-off-outline"
               size={64}
-              color={COLORS.textLight}
+              color={colors.textLight}
               style={styles.emptyIcon}
             />
-            <Text style={styles.emptyTitle}>You’re all caught up</Text>
+            <Text style={styles.emptyTitle}>You're all caught up</Text>
             <Text style={styles.emptyText}>
               New notifications about your bookings and vendors will appear here.
             </Text>
@@ -145,152 +147,153 @@ const NotificationsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.xl,
-    paddingBottom: SPACING.lg,
-    backgroundColor: COLORS.surface,
-    borderBottomLeftRadius: SPACING.xl,
-    borderBottomRightRadius: SPACING.xl,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  headerTitle: {
-    fontSize: FONT_SIZE.xxl,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.text,
-  },
-  headerSubtitle: {
-    marginTop: SPACING.xs,
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textSecondary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  notificationsList: {
-    padding: SPACING.lg,
-    paddingBottom: SPACING.xxxl,
-  },
-  emptyWrapper: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: SPACING.lg,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: SPACING.md,
-  },
-  actionText: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.primary,
-    fontWeight: FONT_WEIGHT.semibold,
-  },
-  actionTextSecondary: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textSecondary,
-  },
-  notificationCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: COLORS.surface,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    marginBottom: SPACING.md,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  unreadCard: {
-    borderLeftWidth: 3,
-    borderLeftColor: COLORS.primary,
-  },
-  iconContainer: {
-    width: 46,
-    height: 46,
-    borderRadius: BORDER_RADIUS.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: SPACING.md,
-  },
-  content: {
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.xs,
-  },
-  title: {
-    fontSize: FONT_SIZE.md,
-    fontWeight: FONT_WEIGHT.semibold,
-    color: COLORS.text,
-    flex: 1,
-  },
-  tagChip: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-    borderRadius: SPACING.lg,
-    backgroundColor: COLORS.background,
-  },
-  tagText: {
-    fontSize: FONT_SIZE.xs,
-    color: COLORS.textSecondary,
-  },
-  message: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  timeIcon: {
-    marginRight: 4,
-  },
-  time: {
-    fontSize: FONT_SIZE.xs,
-    color: COLORS.textLight,
-  },
-  unreadDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: COLORS.primary,
-    marginLeft: SPACING.sm,
-    marginTop: SPACING.xs,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-  },
-  emptyIcon: {
-    marginBottom: SPACING.lg,
-    opacity: 0.6,
-  },
-  emptyTitle: {
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
-  },
-  emptyText: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      paddingHorizontal: SPACING.lg,
+      paddingTop: SPACING.xl,
+      paddingBottom: SPACING.lg,
+      backgroundColor: colors.surface,
+      borderBottomLeftRadius: SPACING.xl,
+      borderBottomRightRadius: SPACING.xl,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.12,
+      shadowRadius: 6,
+      elevation: 4,
+    },
+    headerTitle: {
+      fontSize: FONT_SIZE.xxl,
+      fontWeight: FONT_WEIGHT.bold,
+      color: colors.text,
+    },
+    headerSubtitle: {
+      marginTop: SPACING.xs,
+      fontSize: FONT_SIZE.sm,
+      color: colors.textSecondary,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    notificationsList: {
+      padding: SPACING.lg,
+      paddingBottom: SPACING.xxxl,
+    },
+    emptyWrapper: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      padding: SPACING.lg,
+    },
+    actionsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: SPACING.md,
+    },
+    actionText: {
+      fontSize: FONT_SIZE.sm,
+      color: colors.primary,
+      fontWeight: FONT_WEIGHT.semibold,
+    },
+    actionTextSecondary: {
+      fontSize: FONT_SIZE.sm,
+      color: colors.textSecondary,
+    },
+    notificationCard: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      backgroundColor: colors.surface,
+      borderRadius: BORDER_RADIUS.lg,
+      padding: SPACING.md,
+      marginBottom: SPACING.md,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.12,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    unreadCard: {
+      borderLeftWidth: 3,
+      borderLeftColor: colors.primary,
+    },
+    iconContainer: {
+      width: 46,
+      height: 46,
+      borderRadius: BORDER_RADIUS.md,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: SPACING.md,
+    },
+    content: {
+      flex: 1,
+    },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: SPACING.xs,
+    },
+    title: {
+      fontSize: FONT_SIZE.md,
+      fontWeight: FONT_WEIGHT.semibold,
+      color: colors.text,
+      flex: 1,
+    },
+    tagChip: {
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: 2,
+      borderRadius: SPACING.lg,
+      backgroundColor: colors.background,
+    },
+    tagText: {
+      fontSize: FONT_SIZE.xs,
+      color: colors.textSecondary,
+    },
+    message: {
+      fontSize: FONT_SIZE.sm,
+      color: colors.textSecondary,
+      marginBottom: SPACING.xs,
+    },
+    metaRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    timeIcon: {
+      marginRight: 4,
+    },
+    time: {
+      fontSize: FONT_SIZE.xs,
+      color: colors.textLight,
+    },
+    unreadDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: colors.primary,
+      marginLeft: SPACING.sm,
+      marginTop: SPACING.xs,
+    },
+    emptyContainer: {
+      alignItems: 'center',
+    },
+    emptyIcon: {
+      marginBottom: SPACING.lg,
+      opacity: 0.6,
+    },
+    emptyTitle: {
+      fontSize: FONT_SIZE.lg,
+      fontWeight: FONT_WEIGHT.bold,
+      color: colors.text,
+      marginBottom: SPACING.xs,
+    },
+    emptyText: {
+      fontSize: FONT_SIZE.sm,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+  });
 
 export default NotificationsScreen;

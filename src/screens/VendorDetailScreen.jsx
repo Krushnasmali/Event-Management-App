@@ -10,11 +10,13 @@ import {
   Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT, BORDER_RADIUS } from '../theme/spacing';
 
 const VendorDetailScreen = ({ route, navigation }) => {
+  const { colors } = useTheme();
   const { vendor, categoryColor } = route.params;
+  const styles = createStyles(colors);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -38,7 +40,7 @@ const VendorDetailScreen = ({ route, navigation }) => {
             key={`empty-${i}`}
             name="star-outline"
             size={16}
-            color={COLORS.textLight}
+            color={colors.textLight}
           />
         ))}
       </View>
@@ -46,17 +48,17 @@ const VendorDetailScreen = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={categoryColor} />
 
       {/* Header */}
       <View style={[styles.header, { backgroundColor: categoryColor }]}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <Icon name="arrow-left" size={24} color={COLORS.background} />
+          <Icon name="arrow-left" size={24} color={colors.background} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Vendor details</Text>
         <TouchableOpacity style={styles.headerIconButton}>
-          <Icon name="heart-outline" size={22} color={COLORS.background} />
+          <Icon name="heart-outline" size={22} color={colors.background} />
         </TouchableOpacity>
       </View>
 
@@ -78,7 +80,7 @@ const VendorDetailScreen = ({ route, navigation }) => {
               <Icon
                 name="shield-check"
                 size={16}
-                color={COLORS.success}
+                color={colors.success}
                 style={styles.badgeIcon}
               />
               <Text style={styles.badgePillText}>Verified vendor</Text>
@@ -89,15 +91,15 @@ const VendorDetailScreen = ({ route, navigation }) => {
               styles.availabilityBadge,
               {
                 backgroundColor: vendor.availability
-                  ? COLORS.success
-                  : COLORS.error,
+                  ? colors.success
+                  : colors.error,
               },
             ]}
           >
             <Icon
               name={vendor.availability ? 'check-circle' : 'close-circle'}
               size={16}
-              color={COLORS.background}
+              color={colors.background}
               style={styles.badgeIcon}
             />
             <Text style={styles.badgeText}>
@@ -197,7 +199,7 @@ const VendorDetailScreen = ({ route, navigation }) => {
                 <Icon
                   name="phone"
                   size={20}
-                  color={COLORS.background}
+                  color={colors.background}
                 />
                 <Text style={styles.contactButtonTextPrimary}>Call</Text>
               </TouchableOpacity>
@@ -241,7 +243,7 @@ const VendorDetailScreen = ({ route, navigation }) => {
           <Icon
             name="calendar-check"
             size={22}
-            color={COLORS.background}
+            color={colors.background}
           />
           <Text style={styles.bookButtonText}>Book now</Text>
         </TouchableOpacity>
@@ -250,254 +252,255 @@ const VendorDetailScreen = ({ route, navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
-  },
-  backButton: {
-    padding: SPACING.sm,
-  },
-  headerTitle: {
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.semibold,
-    color: COLORS.background,
-  },
-  headerIconButton: {
-    padding: SPACING.sm,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: SPACING.xxxl + 60,
-  },
-  imageSection: {
-    position: 'relative',
-    width: '100%',
-    height: 260,
-    backgroundColor: COLORS.surface,
-  },
-  vendorImage: {
-    width: '100%',
-    height: '100%',
-  },
-  imageTopRow: {
-    position: 'absolute',
-    top: SPACING.lg,
-    left: SPACING.lg,
-  },
-  badgePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: 4,
-    borderRadius: SPACING.lg,
-    backgroundColor: COLORS.background + 'CC',
-  },
-  badgeIcon: {
-    marginRight: 4,
-  },
-  badgePillText: {
-    fontSize: FONT_SIZE.xs,
-    color: COLORS.success,
-    fontWeight: FONT_WEIGHT.semibold,
-  },
-  availabilityBadge: {
-    position: 'absolute',
-    bottom: SPACING.lg,
-    right: SPACING.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.md,
-  },
-  badgeText: {
-    color: COLORS.background,
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.bold,
-  },
-  infoSection: {
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.lg,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  vendorName: {
-    flex: 1,
-    fontSize: FONT_SIZE.xxxl,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.text,
-  },
-  categoryChip: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: 4,
-    borderRadius: SPACING.lg,
-  },
-  categoryChipText: {
-    fontSize: FONT_SIZE.xs,
-    fontWeight: FONT_WEIGHT.semibold,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.lg,
-  },
-  starsContainer: {
-    flexDirection: 'row',
-  },
-  ratingText: {
-    marginLeft: SPACING.sm,
-    fontSize: FONT_SIZE.md,
-    fontWeight: FONT_WEIGHT.semibold,
-    color: COLORS.text,
-  },
-  ratingSubText: {
-    marginLeft: SPACING.xs,
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textSecondary,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.md,
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  infoIcon: {
-    marginRight: SPACING.md,
-    marginTop: SPACING.xs,
-  },
-  infoContent: {
-    flex: 1,
-  },
-  infoLabel: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textLight,
-    marginBottom: 2,
-  },
-  infoValue: {
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.semibold,
-    color: COLORS.text,
-  },
-  sectionBlock: {
-    marginTop: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
-  },
-  sectionSubtitle: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.md,
-  },
-  descriptionText: {
-    fontSize: FONT_SIZE.md,
-    color: COLORS.textSecondary,
-    lineHeight: 22,
-  },
-  contactButtonsContainer: {
-    flexDirection: 'row',
-    gap: SPACING.md,
-    justifyContent: 'space-between',
-  },
-  contactButtonPrimary: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    gap: SPACING.sm,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  contactButtonSecondary: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 1,
-    borderColor: categoryColor => categoryColor || COLORS.primary,
-    gap: SPACING.sm,
-    backgroundColor: COLORS.background,
-  },
-  contactButtonTextPrimary: {
-    color: COLORS.background,
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.bold,
-  },
-  contactButtonTextSecondary: {
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.bold,
-  },
-  bottomBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    backgroundColor: COLORS.surface,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 10,
-  },
-  bottomLabel: {
-    fontSize: FONT_SIZE.xs,
-    color: COLORS.textLight,
-  },
-  bottomPrice: {
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.text,
-  },
-  bottomPriceUnit: {
-    fontSize: FONT_SIZE.sm,
-    color: COLORS.textSecondary,
-    fontWeight: FONT_WEIGHT.medium,
-  },
-  bookButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    gap: SPACING.sm,
-  },
-  bookButtonText: {
-    fontSize: FONT_SIZE.md,
-    fontWeight: FONT_WEIGHT.bold,
-    color: COLORS.background,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.lg,
+    },
+    backButton: {
+      padding: SPACING.sm,
+    },
+    headerTitle: {
+      fontSize: FONT_SIZE.lg,
+      fontWeight: FONT_WEIGHT.semibold,
+      color: '#FFFFFF',
+    },
+    headerIconButton: {
+      padding: SPACING.sm,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingBottom: SPACING.xxxl + 60,
+    },
+    imageSection: {
+      position: 'relative',
+      width: '100%',
+      height: 260,
+      backgroundColor: colors.surface,
+    },
+    vendorImage: {
+      width: '100%',
+      height: '100%',
+    },
+    imageTopRow: {
+      position: 'absolute',
+      top: SPACING.lg,
+      left: SPACING.lg,
+    },
+    badgePill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: 4,
+      borderRadius: SPACING.lg,
+      backgroundColor: colors.background + 'CC',
+    },
+    badgeIcon: {
+      marginRight: 4,
+    },
+    badgePillText: {
+      fontSize: FONT_SIZE.xs,
+      color: colors.success,
+      fontWeight: FONT_WEIGHT.semibold,
+    },
+    availabilityBadge: {
+      position: 'absolute',
+      bottom: SPACING.lg,
+      right: SPACING.lg,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm,
+      borderRadius: BORDER_RADIUS.md,
+    },
+    badgeText: {
+      color: colors.background,
+      fontSize: FONT_SIZE.sm,
+      fontWeight: FONT_WEIGHT.bold,
+    },
+    infoSection: {
+      paddingHorizontal: SPACING.lg,
+      paddingTop: SPACING.lg,
+    },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: SPACING.sm,
+    },
+    vendorName: {
+      flex: 1,
+      fontSize: FONT_SIZE.xxxl,
+      fontWeight: FONT_WEIGHT.bold,
+      color: colors.text,
+    },
+    categoryChip: {
+      paddingHorizontal: SPACING.md,
+      paddingVertical: 4,
+      borderRadius: SPACING.lg,
+    },
+    categoryChipText: {
+      fontSize: FONT_SIZE.xs,
+      fontWeight: FONT_WEIGHT.semibold,
+    },
+    ratingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: SPACING.lg,
+    },
+    starsContainer: {
+      flexDirection: 'row',
+    },
+    ratingText: {
+      marginLeft: SPACING.sm,
+      fontSize: FONT_SIZE.md,
+      fontWeight: FONT_WEIGHT.semibold,
+      color: colors.text,
+    },
+    ratingSubText: {
+      marginLeft: SPACING.xs,
+      fontSize: FONT_SIZE.sm,
+      color: colors.textSecondary,
+    },
+    infoRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: SPACING.md,
+      paddingVertical: SPACING.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    infoIcon: {
+      marginRight: SPACING.md,
+      marginTop: SPACING.xs,
+    },
+    infoContent: {
+      flex: 1,
+    },
+    infoLabel: {
+      fontSize: FONT_SIZE.sm,
+      color: colors.textLight,
+      marginBottom: 2,
+    },
+    infoValue: {
+      fontSize: FONT_SIZE.lg,
+      fontWeight: FONT_WEIGHT.semibold,
+      color: colors.text,
+    },
+    sectionBlock: {
+      marginTop: SPACING.lg,
+    },
+    sectionTitle: {
+      fontSize: FONT_SIZE.lg,
+      fontWeight: FONT_WEIGHT.bold,
+      color: colors.text,
+      marginBottom: SPACING.sm,
+    },
+    sectionSubtitle: {
+      fontSize: FONT_SIZE.sm,
+      color: colors.textSecondary,
+      marginBottom: SPACING.md,
+    },
+    descriptionText: {
+      fontSize: FONT_SIZE.md,
+      color: colors.textSecondary,
+      lineHeight: 22,
+    },
+    contactButtonsContainer: {
+      flexDirection: 'row',
+      gap: SPACING.md,
+      justifyContent: 'space-between',
+    },
+    contactButtonPrimary: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: SPACING.md,
+      borderRadius: BORDER_RADIUS.md,
+      gap: SPACING.sm,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    contactButtonSecondary: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: SPACING.md,
+      borderRadius: BORDER_RADIUS.md,
+      borderWidth: 1,
+      borderColor: '#FF6B6B',
+      gap: SPACING.sm,
+      backgroundColor: colors.background,
+    },
+    contactButtonTextPrimary: {
+      color: colors.background,
+      fontSize: FONT_SIZE.sm,
+      fontWeight: FONT_WEIGHT.bold,
+    },
+    contactButtonTextSecondary: {
+      fontSize: FONT_SIZE.sm,
+      fontWeight: FONT_WEIGHT.bold,
+    },
+    bottomBar: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+      backgroundColor: colors.surface,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.12,
+      shadowRadius: 4,
+      elevation: 10,
+    },
+    bottomLabel: {
+      fontSize: FONT_SIZE.xs,
+      color: colors.textLight,
+    },
+    bottomPrice: {
+      fontSize: FONT_SIZE.lg,
+      fontWeight: FONT_WEIGHT.bold,
+      color: colors.text,
+    },
+    bottomPriceUnit: {
+      fontSize: FONT_SIZE.sm,
+      color: colors.textSecondary,
+      fontWeight: FONT_WEIGHT.medium,
+    },
+    bookButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.xl,
+      paddingVertical: SPACING.md,
+      borderRadius: BORDER_RADIUS.lg,
+      gap: SPACING.sm,
+    },
+    bookButtonText: {
+      fontSize: FONT_SIZE.md,
+      fontWeight: FONT_WEIGHT.bold,
+      color: colors.background,
+    },
+  });
 
 export default VendorDetailScreen;

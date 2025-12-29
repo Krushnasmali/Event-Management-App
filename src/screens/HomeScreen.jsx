@@ -1,4 +1,3 @@
-// screens/HomeScreen.js
 import React, { useCallback, useState, useMemo } from 'react';
 import {
   View,
@@ -10,15 +9,12 @@ import {
   TextInput,
   TouchableOpacity,
   ImageBackground,
-  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT } from '../theme/spacing';
 import { CATEGORIES_DATA } from '../data/categoriesData';
 
-// dummy data for featured + nearby events
 const FEATURED_EVENT = {
   title: 'International Concert',
   subtitle: 'Global music, unified harmony',
@@ -45,23 +41,19 @@ const NEARBY_EVENTS = [
 ];
 
 const HomeScreen = ({ navigation }) => {
-  const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all');
   const [activeTrending, setActiveTrending] = useState('all');
 
   const filteredCategories = useMemo(() => {
-    const base = CATEGORIES_DATA.filter(category =>
+    return CATEGORIES_DATA.filter(category =>
       category.name.toLowerCase().includes(searchText.toLowerCase())
     );
-    return base;
   }, [searchText]);
 
   const handleCategoryPress = useCallback(
     category => {
       navigation.navigate('CategoryScreen', {
         categoryName: category.name,
-        categoryId: category.id,
         categoryColor: category.color,
         categoryDescription: category.description,
       });
@@ -77,8 +69,6 @@ const HomeScreen = ({ navigation }) => {
     >
       <LinearGradient
         colors={[item.color || '#7b5cff', '#4a2b9b']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
         style={styles.categoryGradient}
       >
         <View style={styles.categoryIconWrapper}>
@@ -108,27 +98,24 @@ const HomeScreen = ({ navigation }) => {
         </View>
         <Text style={styles.nearbyPeopleText}>{item.people}</Text>
       </View>
-      <View style={styles.nearbyVenueRow}>
-        <Icon name="map-marker" size={14} color="#A5A1CC" />
-        <Text style={styles.nearbyVenueText}>{item.venue}</Text>
-      </View>
     </View>
   );
 
   const renderHeader = () => (
     <LinearGradient
       colors={['#1E063C', '#090017']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
       style={styles.headerGradient}
     >
+      {/* TOP BAR */}
       <View style={styles.headerTopRow}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View style={styles.logoCircle}>
-            <Icon name="flare" size={18} color="#fff" />
-          </View>
+          {/* PROFILE ICON (BLACK + BORDER) */}
+          <TouchableOpacity style={styles.profileCircle}>
+            <Icon name="account" size={18} color="#000" />
+          </TouchableOpacity>
           <Text style={styles.appName}>Evno</Text>
         </View>
+
         <View style={styles.headerIconRow}>
           <TouchableOpacity
             style={styles.headerIconButton}
@@ -136,139 +123,59 @@ const HomeScreen = ({ navigation }) => {
           >
             <Icon name="bell-outline" size={20} color="#FFFFFFCC" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerIconButton}>
-            <Icon name="bookmark-outline" size={20} color="#FFFFFFCC" />
-          </TouchableOpacity>
         </View>
       </View>
 
       <Text style={styles.headerGreeting}>Hi, Good Evening 👋</Text>
       <Text style={styles.headerBigTitle}>Discover Events</Text>
 
-      {/* Search bar */}
+      {/* SEARCH */}
       <View style={styles.searchRow}>
         <View style={styles.searchContainer}>
-          <Icon name="magnify" size={20} color="#8A80B8" style={styles.searchIcon} />
+          <Icon name="magnify" size={20} color="#8A80B8" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search concerts, festivals..."
             placeholderTextColor="#766CA6"
             value={searchText}
             onChangeText={setSearchText}
-            returnKeyType="search"
           />
-          {searchText.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchText('')}>
-              <Icon name="close-circle" size={18} color="#766CA6" />
-            </TouchableOpacity>
-          )}
         </View>
-        <TouchableOpacity style={styles.filterButton} activeOpacity={0.8}>
-          <Icon name="tune-variant" size={20} color="#B9A4FF" />
-        </TouchableOpacity>
       </View>
 
-      {/* Featured card */}
+      {/* FEATURED */}
       <TouchableOpacity activeOpacity={0.9} style={styles.featuredWrapper}>
         <ImageBackground
           source={require('../assets/images/featured-concert.jpg')}
           style={styles.featuredImage}
-          imageStyle={styles.featuredImageRadius}
+          imageStyle={{ borderRadius: 24 }}
         >
           <LinearGradient
             colors={['#150333CC', '#150333EE']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
             style={styles.featuredOverlay}
           >
             <Text style={styles.featuredLabel}>Featured</Text>
             <Text style={styles.featuredTitle}>{FEATURED_EVENT.title}</Text>
             <Text style={styles.featuredSubtitle}>{FEATURED_EVENT.subtitle}</Text>
-
             <TouchableOpacity style={styles.featuredCtaBtn}>
               <Text style={styles.featuredCtaText}>{FEATURED_EVENT.cta}</Text>
             </TouchableOpacity>
-
-            <View style={styles.featuredFooterRow}>
-              <View style={styles.featuredMetaItem}>
-                <Icon name="calendar" size={14} color="#D5C8FF" />
-                <Text style={styles.featuredMetaText}>30 Dec</Text>
-              </View>
-              <View style={styles.featuredMetaItem}>
-                <Icon name="map-marker-outline" size={14} color="#D5C8FF" />
-                <Text style={styles.featuredMetaText}>Jakarta, ID</Text>
-              </View>
-            </View>
           </LinearGradient>
         </ImageBackground>
       </TouchableOpacity>
 
-      {/* Trending section */}
-      <View style={styles.sectionRow}>
-        <Text style={styles.sectionTitle}>Trending</Text>
-        <TouchableOpacity>
-          <Text style={styles.sectionSeeAll}>See all</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.trendingChipsRow}>
-        {[
-          { key: 'all', label: 'All' },
-          { key: 'art', label: 'Art' },
-          { key: 'music', label: 'Music' },
-          { key: 'sport', label: 'Sport' },
-        ].map(chip => (
-          <TouchableOpacity
-            key={chip.key}
-            activeOpacity={0.8}
-            onPress={() => setActiveTrending(chip.key)}
-            style={[
-              styles.trendingChip,
-              activeTrending === chip.key && styles.trendingChipActive,
-            ]}
-          >
-            <Text
-              style={[
-                styles.trendingChipText,
-                activeTrending === chip.key && styles.trendingChipTextActive,
-              ]}
-            >
-              {chip.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Nearby section */}
-      <View style={styles.sectionRow}>
-        <Text style={styles.sectionTitle}>Nearby Your Location</Text>
-        <TouchableOpacity>
-          <Text style={styles.sectionSeeAll}>See all</Text>
-        </TouchableOpacity>
-      </View>
-
+      {/* NEARBY */}
       <View style={styles.nearbyRow}>
         {NEARBY_EVENTS.map(renderNearbyCard)}
       </View>
 
-      {/* categories header */}
-      <View style={styles.sectionRow}>
-        <View>
-          <Text style={styles.sectionTitle}>Browse categories</Text>
-          <Text style={styles.sectionSubtitle}>
-            {filteredCategories.length} options
-          </Text>
-        </View>
-      </View>
+      <Text style={styles.sectionTitle}>Browse categories</Text>
     </LinearGradient>
   );
 
   return (
-    <SafeAreaView style={[styles.container]}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#090017"
-      />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#090017" />
       <FlatList
         data={filteredCategories}
         renderItem={renderCategoryItem}
@@ -283,6 +190,8 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+export default HomeScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -290,15 +199,9 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: SPACING.xxxl * 2,
-    backgroundColor: '#050012',
-  },
-  columnWrapper: {
-    paddingHorizontal: SPACING.lg,
-    justifyContent: 'space-between',
-    marginTop: SPACING.md,
   },
 
-  // HEADER
+  /* HEADER */
   headerGradient: {
     paddingTop: SPACING.xxl,
     paddingHorizontal: SPACING.lg,
@@ -308,14 +211,16 @@ const styles = StyleSheet.create({
   },
   headerTopRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  logoCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#B783FF',
+  profileCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: '#000',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -336,208 +241,115 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF22',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 10,
     backgroundColor: '#FFFFFF08',
   },
+
   headerGreeting: {
     marginTop: SPACING.lg,
     fontSize: FONT_SIZE.sm,
     color: '#C6B6FF',
   },
   headerBigTitle: {
-    marginTop: 4,
     fontSize: 28,
     fontWeight: FONT_WEIGHT.bold,
     color: '#FFFFFF',
   },
 
-  // SEARCH
+  /* SEARCH */
   searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginTop: SPACING.lg,
   },
   searchContainer: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    padding: SPACING.md,
     borderRadius: 999,
     backgroundColor: '#1A0F3A',
   },
-  searchIcon: {
-    marginRight: SPACING.sm,
-  },
   searchInput: {
-    flex: 1,
-    fontSize: FONT_SIZE.md,
+    marginLeft: 8,
     color: '#FFFFFF',
-  },
-  filterButton: {
-    marginLeft: SPACING.md,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#1A0F3A',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
   },
 
-  // FEATURED
+  /* FEATURED */
   featuredWrapper: {
     marginTop: SPACING.xl,
   },
   featuredImage: {
     height: 180,
-    width: '100%',
-  },
-  featuredImageRadius: {
-    borderRadius: 24,
   },
   featuredOverlay: {
     flex: 1,
     borderRadius: 24,
     padding: SPACING.lg,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
   featuredLabel: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    backgroundColor: '#FFFFFF22',
     color: '#F6EEFF',
     fontSize: FONT_SIZE.xs,
   },
   featuredTitle: {
-    marginTop: SPACING.sm,
     fontSize: FONT_SIZE.xl,
     fontWeight: FONT_WEIGHT.bold,
     color: '#FFFFFF',
   },
   featuredSubtitle: {
-    marginTop: 2,
     fontSize: FONT_SIZE.sm,
     color: '#D4C9FF',
   },
   featuredCtaBtn: {
     marginTop: SPACING.sm,
-    alignSelf: 'flex-start',
+    backgroundColor: '#B783FF',
     paddingHorizontal: 18,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: '#B783FF',
+    alignSelf: 'flex-start',
   },
   featuredCtaText: {
     color: '#090017',
     fontWeight: FONT_WEIGHT.semibold,
-    fontSize: FONT_SIZE.sm,
-  },
-  featuredFooterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: SPACING.md,
-  },
-  featuredMetaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  featuredMetaText: {
-    marginLeft: 4,
-    fontSize: FONT_SIZE.xs,
-    color: '#D5C8FF',
   },
 
-  // SECTIONS
-  sectionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: SPACING.xl,
-  },
-  sectionTitle: {
-    fontSize: FONT_SIZE.lg,
-    fontWeight: FONT_WEIGHT.bold,
-    color: '#FFFFFF',
-  },
-  sectionSeeAll: {
-    fontSize: FONT_SIZE.xs,
-    color: '#B483FF',
-  },
-  sectionSubtitle: {
-    marginTop: 2,
-    fontSize: FONT_SIZE.xs,
-    color: '#9489C6',
-  },
-
-  // TRENDING CHIPS
-  trendingChipsRow: {
-    flexDirection: 'row',
-    marginTop: SPACING.md,
-  },
-  trendingChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: '#15092C',
-    marginRight: 10,
-  },
-  trendingChipActive: {
-    backgroundColor: '#B783FF',
-  },
-  trendingChipText: {
-    fontSize: FONT_SIZE.xs,
-    color: '#A29AD3',
-  },
-  trendingChipTextActive: {
-    color: '#090017',
-    fontWeight: FONT_WEIGHT.semibold,
-  },
-
-  // NEARBY
+  /* NEARBY */
   nearbyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: SPACING.md,
+    marginTop: SPACING.lg,
   },
   nearbyCard: {
     width: '48%',
   },
   nearbyImage: {
     height: 110,
-    width: '100%',
   },
   nearbyDateBadge: {
     position: 'absolute',
     top: 10,
     left: 10,
+    backgroundColor: '#FFFFFFDD',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: '#FFFFFFDD',
   },
   nearbyDateText: {
     fontSize: FONT_SIZE.xs,
     fontWeight: FONT_WEIGHT.semibold,
-    color: '#4A2B9B',
   },
   nearbyTitle: {
-    marginTop: 8,
-    fontSize: FONT_SIZE.sm,
-    fontWeight: FONT_WEIGHT.semibold,
+    marginTop: 6,
     color: '#FFFFFF',
+    fontWeight: FONT_WEIGHT.semibold,
   },
   nearbyMetaRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginTop: 4,
   },
   nearbyTagPill: {
+    backgroundColor: '#2B184F',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
-    backgroundColor: '#2B184F',
     marginRight: 6,
   },
   nearbyTagText: {
@@ -548,18 +360,19 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZE.xs,
     color: '#A5A1CC',
   },
-  nearbyVenueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  nearbyVenueText: {
-    marginLeft: 4,
-    fontSize: FONT_SIZE.xs,
-    color: '#A5A1CC',
-  },
 
-  // CATEGORY CARDS
+  /* CATEGORIES */
+  sectionTitle: {
+    marginTop: SPACING.xl,
+    fontSize: FONT_SIZE.lg,
+    fontWeight: FONT_WEIGHT.bold,
+    color: '#FFFFFF',
+  },
+  columnWrapper: {
+    paddingHorizontal: SPACING.lg,
+    justifyContent: 'space-between',
+    marginTop: SPACING.md,
+  },
   categoryCard: {
     width: '48%',
     marginBottom: SPACING.lg,
@@ -583,10 +396,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   categoryCount: {
-    marginTop: 4,
     fontSize: FONT_SIZE.xs,
     color: '#E4D9FF',
   },
 });
-
-export default HomeScreen;

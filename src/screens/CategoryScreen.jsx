@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT, BORDER_RADIUS } from '../theme/spacing';
@@ -15,8 +16,10 @@ import Dropdown from '../components/Dropdown';
 import SectionTitle from '../components/SectionTitle';
 import VendorCard from '../components/VendorCard';
 import {
-  getStatesForCategory,
-  getCitiesForStateAndCategory,
+  getAllStates,
+  getCitiesForState,
+} from '../data/statesAndCities';
+import {
   getVendorsByFilters,
 } from '../data/vendorsData';
 
@@ -27,17 +30,11 @@ const CategoryScreen = ({ route, navigation }) => {
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
 
-  const availableStates = useMemo(
-    () => getStatesForCategory(categoryName),
-    [categoryName]
-  );
+  const availableStates = useMemo(() => getAllStates(), []);
 
   const availableCities = useMemo(
-    () =>
-      selectedState
-        ? getCitiesForStateAndCategory(categoryName, selectedState)
-        : [],
-    [categoryName, selectedState]
+    () => (selectedState ? getCitiesForState(selectedState) : []),
+    [selectedState]
   );
 
   const filteredVendors = useMemo(
@@ -48,29 +45,9 @@ const CategoryScreen = ({ route, navigation }) => {
     [categoryName, selectedState, selectedCity]
   );
 
-  const handleStateChange = (state) => {
-    setSelectedState(state);
-    setSelectedCity(null);
-  };
-
-  const handleCityChange = (city) => {
-    setSelectedCity(city);
-  };
-
-  const handleVendorPress = (vendor) => {
-    navigation.navigate('VendorDetailScreen', {
-      vendor,
-      categoryColor,
-    });
-  };
-
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
-
   const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
-      <Icon name="store-off-outline" size={60} color={colors.textLight} />
+      <Icon name="store-off-outline" size={64} color="#AAA" />
       <Text style={styles.emptyText}>
         {!selectedState || !selectedCity
           ? 'Select state and city to see vendors'
@@ -79,69 +56,87 @@ const CategoryScreen = ({ route, navigation }) => {
     </View>
   );
 
-  const renderVendorItem = ({ item }) => (
-    <VendorCard
-      vendor={item}
-      onPress={() => handleVendorPress(item)}
-      categoryColor={categoryColor}
-    />
-  );
-
-  const styles = createStyles(colors);
-
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="light-content" backgroundColor={categoryColor} />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#090017" />
 
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: categoryColor }]}>
-        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <Icon name="arrow-left" size={24} color={colors.background} />
+      <LinearGradient
+        colors={['#1E063C', '#090017']}
+        style={styles.header}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-left" size={24} color="#fff" />
         </TouchableOpacity>
-        <View style={styles.headerTextContainer}>
-          <Text style={[styles.headerTitle, { color: colors.background }]}>{categoryName}</Text>
-          <Text style={[styles.headerSubtitle, { color: colors.background }]}>
-            Filter by location & discover trusted vendors
+
+        <View style={{ flex: 1 }}>
+          <Text style={styles.headerTitle}>{categoryName}</Text>
+          <Text style={styles.headerSubtitle}>
+            Filter by location & discover vendors
           </Text>
         </View>
-        <View style={styles.placeholder} />
-      </View>
+      </LinearGradient>
 
-      {/* Filters and Vendor List */}
       <FlatList
         data={filteredVendors}
-        renderItem={renderVendorItem}
-        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <VendorCard
+            vendor={item}
+            onPress={() =>
+              navigation.navigate('VendorDetailScreen', {
+                vendor: item,
+                categoryColor,
+              })
+            }
+            categoryColor={categoryColor}
+          />
+        )}
+        keyExtractor={item => item.id}
         ListHeaderComponent={
           <View style={styles.filtersContainer}>
             <SectionTitle
               title="Find the Perfect Service"
               color={categoryColor}
-              showUnderline={true}
+              showUnderline
             />
 
+            {/* Info Card */}
             <View style={styles.filterCard}>
-              <View style={styles.filterIconCircle}>
+              <View
+                style={[
+                  styles.iconCircle,
+                  { backgroundColor: categoryColor + '33' },
+                ]}
+              >
                 <Icon
                   name="map-search-outline"
                   size={20}
                   color={categoryColor}
                 />
               </View>
-              <View style={styles.filterTextContainer}>
-                <Text style={styles.filterTitle}>Search by location</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.filterTitle}>
+                  Search by location
+                </Text>
                 <Text style={styles.filterSubtitle}>
-                  Choose your state and city to see available vendors
+                  Choose state & city to see available vendors
                 </Text>
               </View>
             </View>
 
-            <View style={styles.dropdownsWrapper}>
+            {/* Dropdowns */}
+            <View style={styles.dropdowns}>
               <Dropdown
                 label="State"
                 selectedValue={selectedState}
                 options={availableStates}
-                onSelect={handleStateChange}
+                onSelect={state => {
+                  setSelectedState(state);
+                  setSelectedCity(null);
+                }}
                 placeholder="Select State"
                 color={categoryColor}
               />
@@ -150,7 +145,7 @@ const CategoryScreen = ({ route, navigation }) => {
                 label="City"
                 selectedValue={selectedCity}
                 options={availableCities}
-                onSelect={handleCityChange}
+                onSelect={setSelectedCity}
                 placeholder="Select City"
                 color={categoryColor}
                 disabled={!selectedState}
@@ -158,8 +153,8 @@ const CategoryScreen = ({ route, navigation }) => {
             </View>
 
             {filteredVendors.length > 0 && (
-              <View style={[styles.resultsInfo, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.resultsText, { color: colors.textSecondary }]}>
+              <View style={styles.results}>
+                <Text style={styles.resultsText}>
                   Found {filteredVendors.length} vendor
                   {filteredVendors.length !== 1 ? 's' : ''}
                 </Text>
@@ -169,123 +164,120 @@ const CategoryScreen = ({ route, navigation }) => {
         }
         ListEmptyComponent={renderEmptyList}
         contentContainerStyle={styles.listContent}
-        scrollEnabled={true}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
 };
 
-const createStyles = (colors, isDarkMode) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.lg,
-      borderBottomLeftRadius: SPACING.xl,
-      borderBottomRightRadius: SPACING.xl,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.2,
-      shadowRadius: 5,
-      elevation: 4,
-    },
-    backButton: {
-      padding: SPACING.sm,
-      marginRight: SPACING.sm,
-    },
-    headerTextContainer: {
-      flex: 1,
-    },
-    headerTitle: {
-      fontSize: FONT_SIZE.xxl,
-      fontWeight: FONT_WEIGHT.bold,
-    },
-    headerSubtitle: {
-      marginTop: SPACING.xs,
-      fontSize: FONT_SIZE.sm,
-      opacity: 0.9,
-    },
-    placeholder: {
-      width: 32,
-    },
-    filtersContainer: {
-      backgroundColor: colors.background,
-      paddingBottom: SPACING.lg,
-    },
-    filterCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: SPACING.lg,
-      marginTop: SPACING.lg,
-      padding: SPACING.md,
-      backgroundColor: colors.surface,
-      borderRadius: BORDER_RADIUS.lg,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    filterIconCircle: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: colors.overlay,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: SPACING.md,
-    },
-    filterTextContainer: {
-      flex: 1,
-    },
-    filterTitle: {
-      fontSize: FONT_SIZE.md,
-      fontWeight: FONT_WEIGHT.semibold,
-      color: colors.text,
-    },
-    filterSubtitle: {
-      marginTop: 2,
-      fontSize: FONT_SIZE.xs,
-      color: colors.textSecondary,
-    },
-    dropdownsWrapper: {
-      paddingHorizontal: SPACING.lg,
-      gap: SPACING.md,
-      marginTop: SPACING.lg,
-    },
-    resultsInfo: {
-      marginHorizontal: SPACING.lg,
-      marginTop: SPACING.lg,
-      paddingVertical: SPACING.md,
-      paddingHorizontal: SPACING.md,
-      borderRadius: BORDER_RADIUS.md,
-    },
-    resultsText: {
-      fontSize: FONT_SIZE.md,
-      fontWeight: FONT_WEIGHT.semibold,
-    },
-    listContent: {
-      flexGrow: 1,
-      paddingVertical: SPACING.md,
-    },
-    emptyContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: SPACING.lg,
-      minHeight: 300,
-    },
-    emptyText: {
-      fontSize: FONT_SIZE.md,
-      color: colors.textLight,
-      marginTop: SPACING.lg,
-      textAlign: 'center',
-    },
-  });
-
 export default CategoryScreen;
+
+/* ---------------- STYLES ---------------- */
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#050012',
+  },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.xl,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+  },
+
+  backButton: {
+    marginRight: SPACING.md,
+  },
+
+  headerTitle: {
+    fontSize: FONT_SIZE.xxl,
+    fontWeight: FONT_WEIGHT.bold,
+    color: '#fff',
+  },
+
+  headerSubtitle: {
+    marginTop: 2,
+    fontSize: FONT_SIZE.sm,
+    color: '#C6B6FF',
+  },
+
+  filtersContainer: {
+    paddingBottom: SPACING.lg,
+  },
+
+  filterCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    padding: SPACING.md,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+
+  iconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.md,
+  },
+
+  filterTitle: {
+    fontSize: FONT_SIZE.md,
+    fontWeight: FONT_WEIGHT.semibold,
+    color: '#fff',
+  },
+
+  filterSubtitle: {
+    marginTop: 2,
+    fontSize: FONT_SIZE.xs,
+    color: '#AAA',
+  },
+
+  dropdowns: {
+    marginTop: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+    gap: SPACING.md,
+  },
+
+  results: {
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+
+  resultsText: {
+    fontSize: FONT_SIZE.sm,
+    color: '#AAA',
+    fontWeight: FONT_WEIGHT.semibold,
+  },
+
+  listContent: {
+    flexGrow: 1,
+    paddingVertical: SPACING.md,
+  },
+
+  emptyContainer: {
+    minHeight: 280,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+  },
+
+  emptyText: {
+    marginTop: SPACING.lg,
+    fontSize: FONT_SIZE.md,
+    color: '#AAA',
+    textAlign: 'center',
+  },
+});

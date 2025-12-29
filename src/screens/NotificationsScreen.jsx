@@ -8,12 +8,14 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../theme/ThemeContext';
 import { SPACING, FONT_SIZE, FONT_WEIGHT, BORDER_RADIUS } from '../theme/spacing';
 
 const NotificationsScreen = () => {
   const { colors } = useTheme();
+
   const notifications = [
     {
       id: 1,
@@ -21,7 +23,7 @@ const NotificationsScreen = () => {
       title: 'Booking Confirmed',
       message: 'Your DJ booking for 25th Dec is confirmed',
       time: '2 hours ago',
-      color: '#4ECDC4',
+      color: '#8B5CF6',
       unread: true,
       tag: 'Booking',
     },
@@ -31,7 +33,7 @@ const NotificationsScreen = () => {
       title: 'Rate Your Service',
       message: 'Please rate your recent catering service',
       time: '5 hours ago',
-      color: '#FFE66D',
+      color: '#FBBF24',
       unread: false,
       tag: 'Feedback',
     },
@@ -41,7 +43,7 @@ const NotificationsScreen = () => {
       title: 'Service Provider Called',
       message: 'Your Hall vendor has called you',
       time: '1 day ago',
-      color: '#95E1D3',
+      color: '#34D399',
       unread: false,
       tag: 'Update',
     },
@@ -52,93 +54,93 @@ const NotificationsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor="#0B061A" />
 
+      {/* Background Gradient */}
+      <LinearGradient
+        colors={['#0B061A', '#1A0B3D', '#2A0E6F']}
+        style={StyleSheet.absoluteFill}
+      />
+
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notifications</Text>
         <Text style={styles.headerSubtitle}>
-          Stay updated with your bookings and vendors
+          Stay updated with your bookings & vendors
         </Text>
       </View>
 
       <ScrollView
-        style={styles.scrollView}
         contentContainerStyle={
-          hasNotifications ? styles.notificationsList : styles.emptyWrapper
+          hasNotifications ? styles.list : styles.emptyWrapper
         }
         showsVerticalScrollIndicator={false}
       >
         {hasNotifications ? (
           <>
+            {/* Actions */}
             <View style={styles.actionsRow}>
-              <TouchableOpacity activeOpacity={0.8}>
-                <Text style={styles.actionText}>Mark all as read</Text>
+              <TouchableOpacity>
+                <Text style={styles.actionPrimary}>Mark all as read</Text>
               </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.8}>
-                <Text style={styles.actionTextSecondary}>Clear all</Text>
+              <TouchableOpacity>
+                <Text style={styles.actionSecondary}>Clear all</Text>
               </TouchableOpacity>
             </View>
 
-            {notifications.map((notification) => (
+            {notifications.map((item) => (
               <TouchableOpacity
-                key={notification.id}
+                key={item.id}
+                activeOpacity={0.85}
                 style={[
                   styles.notificationCard,
-                  notification.unread && styles.unreadCard,
+                  item.unread && styles.unreadCard,
                 ]}
-                activeOpacity={0.8}
               >
                 <View
                   style={[
-                    styles.iconContainer,
-                    { backgroundColor: notification.color + '22' },
+                    styles.iconBox,
+                    { backgroundColor: item.color + '22' },
                   ]}
                 >
-                  <Icon
-                    name={notification.icon}
-                    size={22}
-                    color={notification.color}
-                  />
+                  <Icon name={item.icon} size={22} color={item.color} />
                 </View>
 
                 <View style={styles.content}>
                   <View style={styles.titleRow}>
-                    <Text style={styles.title}>{notification.title}</Text>
-                    {!!notification.tag && (
-                      <View style={styles.tagChip}>
-                        <Text style={styles.tagText}>{notification.tag}</Text>
+                    <Text style={styles.title}>{item.title}</Text>
+                    {item.tag && (
+                      <View style={styles.tag}>
+                        <Text style={styles.tagText}>{item.tag}</Text>
                       </View>
                     )}
                   </View>
+
                   <Text style={styles.message} numberOfLines={2}>
-                    {notification.message}
+                    {item.message}
                   </Text>
-                  <View style={styles.metaRow}>
+
+                  <View style={styles.timeRow}>
                     <Icon
                       name="clock-outline"
-                      size={14}
-                      color={colors.textLight}
-                      style={styles.timeIcon}
+                      size={13}
+                      color="#AAA"
+                      style={{ marginRight: 4 }}
                     />
-                    <Text style={styles.time}>{notification.time}</Text>
+                    <Text style={styles.time}>{item.time}</Text>
                   </View>
                 </View>
 
-                {notification.unread && <View style={styles.unreadDot} />}
+                {item.unread && <View style={styles.unreadDot} />}
               </TouchableOpacity>
             ))}
           </>
         ) : (
           <View style={styles.emptyContainer}>
-            <Icon
-              name="bell-off-outline"
-              size={64}
-              color={colors.textLight}
-              style={styles.emptyIcon}
-            />
+            <Icon name="bell-off-outline" size={64} color="#AAA" />
             <Text style={styles.emptyTitle}>You're all caught up</Text>
             <Text style={styles.emptyText}>
-              New notifications about your bookings and vendors will appear here.
+              New notifications will appear here.
             </Text>
           </View>
         )}
@@ -147,79 +149,75 @@ const NotificationsScreen = () => {
   );
 };
 
-const createStyles = (colors) =>
+export default NotificationsScreen;
+
+const createStyles = () =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: '#0B061A',
     },
+
     header: {
-      paddingHorizontal: SPACING.lg,
-      paddingTop: SPACING.xl,
+      padding: SPACING.xl,
       paddingBottom: SPACING.lg,
-      backgroundColor: colors.surface,
-      borderBottomLeftRadius: SPACING.xl,
-      borderBottomRightRadius: SPACING.xl,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.12,
-      shadowRadius: 6,
-      elevation: 4,
     },
+
     headerTitle: {
       fontSize: FONT_SIZE.xxl,
-      fontWeight: FONT_WEIGHT.bold,
-      color: colors.text,
+      fontWeight: FONT_WEIGHT.black,
+      color: '#fff',
     },
+
     headerSubtitle: {
-      marginTop: SPACING.xs,
+      marginTop: 4,
       fontSize: FONT_SIZE.sm,
-      color: colors.textSecondary,
+      color: '#AAA',
     },
-    scrollView: {
-      flex: 1,
-    },
-    notificationsList: {
+
+    list: {
       padding: SPACING.lg,
-      paddingBottom: SPACING.xxxl,
+      paddingBottom: 140,
     },
+
     emptyWrapper: {
       flexGrow: 1,
       justifyContent: 'center',
       padding: SPACING.lg,
     },
+
     actionsRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: SPACING.md,
     },
-    actionText: {
-      fontSize: FONT_SIZE.sm,
-      color: colors.primary,
+
+    actionPrimary: {
+      color: '#8B5CF6',
       fontWeight: FONT_WEIGHT.semibold,
     },
-    actionTextSecondary: {
-      fontSize: FONT_SIZE.sm,
-      color: colors.textSecondary,
+
+    actionSecondary: {
+      color: '#AAA',
     },
+
     notificationCard: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      backgroundColor: colors.surface,
+      backgroundColor: 'rgba(255,255,255,0.08)',
       borderRadius: BORDER_RADIUS.lg,
       padding: SPACING.md,
       marginBottom: SPACING.md,
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.12,
-      shadowRadius: 4,
-      elevation: 3,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.12)',
     },
+
     unreadCard: {
       borderLeftWidth: 3,
-      borderLeftColor: colors.primary,
+      borderLeftColor: '#8B5CF6',
     },
-    iconContainer: {
+
+    iconBox: {
       width: 46,
       height: 46,
       borderRadius: BORDER_RADIUS.md,
@@ -227,73 +225,76 @@ const createStyles = (colors) =>
       alignItems: 'center',
       marginRight: SPACING.md,
     },
+
     content: {
       flex: 1,
     },
+
     titleRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: SPACING.xs,
+      marginBottom: 4,
     },
+
     title: {
+      flex: 1,
       fontSize: FONT_SIZE.md,
       fontWeight: FONT_WEIGHT.semibold,
-      color: colors.text,
-      flex: 1,
+      color: '#fff',
     },
-    tagChip: {
-      paddingHorizontal: SPACING.sm,
+
+    tag: {
+      paddingHorizontal: 10,
       paddingVertical: 2,
-      borderRadius: SPACING.lg,
-      backgroundColor: colors.background,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255,255,255,0.15)',
     },
+
     tagText: {
       fontSize: FONT_SIZE.xs,
-      color: colors.textSecondary,
+      color: '#DDD',
     },
+
     message: {
       fontSize: FONT_SIZE.sm,
-      color: colors.textSecondary,
-      marginBottom: SPACING.xs,
+      color: '#AAA',
+      marginBottom: 6,
     },
-    metaRow: {
+
+    timeRow: {
       flexDirection: 'row',
       alignItems: 'center',
     },
-    timeIcon: {
-      marginRight: 4,
-    },
+
     time: {
       fontSize: FONT_SIZE.xs,
-      color: colors.textLight,
+      color: '#AAA',
     },
+
     unreadDot: {
       width: 10,
       height: 10,
       borderRadius: 5,
-      backgroundColor: colors.primary,
-      marginLeft: SPACING.sm,
-      marginTop: SPACING.xs,
+      backgroundColor: '#8B5CF6',
+      marginLeft: 8,
+      marginTop: 6,
     },
+
     emptyContainer: {
       alignItems: 'center',
     },
-    emptyIcon: {
-      marginBottom: SPACING.lg,
-      opacity: 0.6,
-    },
+
     emptyTitle: {
+      marginTop: 16,
       fontSize: FONT_SIZE.lg,
       fontWeight: FONT_WEIGHT.bold,
-      color: colors.text,
-      marginBottom: SPACING.xs,
+      color: '#fff',
     },
+
     emptyText: {
+      marginTop: 6,
       fontSize: FONT_SIZE.sm,
-      color: colors.textSecondary,
+      color: '#AAA',
       textAlign: 'center',
-      lineHeight: 20,
     },
   });
-
-export default NotificationsScreen;
